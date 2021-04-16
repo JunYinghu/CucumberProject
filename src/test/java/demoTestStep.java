@@ -11,23 +11,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 
-
 import static org.junit.Assert.*;
 
 public class demoTestStep {
-
     private WebDriver driver;
 
     @Before
     public void setup() {
-        // declaration and instantiation of objects/variables
-        // System.setProperty("webdriver.gecko.driver","C:\\geckodriver.exe");
-        // WebDriver driver = new FirefoxDriver();
-        //comment the above 2 lines and uncomment below 2 lines to use Chrome
         String driverPath = System.getProperty("user.dir") + File.separator + "driver" + File.separator + "chromedriver.exe";
         System.setProperty("webdriver.chrome.driver", driverPath);
         driver = new ChromeDriver();
-
     }
 
     @Given("^User is on \"(.*)\" page$")
@@ -36,8 +29,8 @@ public class demoTestStep {
     }
 
     @When("^User enter \"(.*)\" in search box \"(.*)\"$")
-    public void userEnterInSearchBox(String searchKeywords, String textboxid) {
-        driver.findElement(By.id(textboxid)).sendKeys(searchKeywords);
+    public void userEnterInSearchBox(String searchKeywords, String textBoxId) {
+        driver.findElement(By.id(textBoxId)).sendKeys(searchKeywords);
     }
 
     @And("^User clicks on Search button \"(.*)\"$")
@@ -47,14 +40,19 @@ public class demoTestStep {
 
     @Then("^user should see \"(.*)\"$")
     public void userShouldSee(String expectedResult) {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.titleContains(expectedResult));
-        searchResultPageVerify(driver.getPageSource(), expectedResult);
+        WebDriverWait wait = new WebDriverWait(driver, 5);
+        if (!expectedResult.contains("remain")) {
+            wait.until(ExpectedConditions.titleContains("_百度搜索"));
+            searchResultPageVerify(driver.getPageSource(), expectedResult);
+        } else {
+            wait.until(ExpectedConditions.titleIs("百度一下，你就知道"));
+            searchResultPageVerify(driver.getPageSource(), driver.getTitle());
+        }
         driver.close();
     }
 
-    private void searchResultPageVerify(String pageSource, String expectedResult) {
-        assertTrue("testing pass", pageSource.contains(expectedResult));
+    private void searchResultPageVerify(String pageSource, String expectedKeywords) {
+        assertTrue("testing pass", pageSource.contains(expectedKeywords));
     }
 }
 
